@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Button from "../ui/Button";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 export default function BasicForm() {
 	const [name, setName] = useState("");
@@ -38,7 +39,7 @@ export default function BasicForm() {
 					Name
 				</label>
 
-				<input
+				<Input
 					id="name"
 					type="text"
 					value={name}
@@ -52,7 +53,7 @@ export default function BasicForm() {
 				>
 					Age
 				</label>
-				<input
+				<Input
 					id="age"
 					type="number"
 					value={age}
@@ -62,7 +63,7 @@ export default function BasicForm() {
 				/>
 			</div>
 
-			<Button text="Submit" />
+			<Button variant="default" size={"default"} >Submit</Button>
 		</form>
 	);
 }
