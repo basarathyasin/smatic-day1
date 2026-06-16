@@ -1,6 +1,6 @@
 "use client";
 
-import BasicForm from "../components/forms/BasicForm";
+import BasicForm from "@/components/forms/BasicForm";
 import {
 	Card,
 	CardContent,
