@@ -1,41 +1,29 @@
 "use client";
 
-import BasicForm from "@/components/forms/BasicForm";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
-
-
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-	return (
-		<main className="min-h-screen bg-slate-100 flex items-center justify-center p-6">
-			<div className="w-full max-w-md">
-				<div className="mb-8 text-center">
-					<h1 className="text-3xl font-bold tracking-tight">
-						Welcome Back
-					</h1>
-				</div>
+  const router = useRouter();
 
-				<Card className="shadow-lg">
-					<CardHeader>
-						<CardTitle>Login</CardTitle>
+  return (
+    <main className="flex min-h-[50vh] items-center justify-center px-6">
+      <section className="max-w-2xl text-center">
+        <h1 className="mb-4 text-5xl font-bold tracking-tight sm:text-6xl">
+          Welcome To Our Store
+        </h1>
 
-						<CardDescription>
-							Enter your details below
-						</CardDescription>
-					</CardHeader>
+        <p className="mb-8 text-lg text-muted-foreground">
+          Discover amazing products at great prices. Browse our collection and
+          find exactly what you need.
+        </p>
 
-					<CardContent>
-						<BasicForm />
-					</CardContent>
-				</Card>
-			</div>
-		</main>
-	);
+        <button
+          onClick={() => router.push("/products")}
+          className="inline-flex items-center rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground transition-opacity hover:opacity-90"
+        >
+          View Products
+        </button>
+      </section>
+    </main>
+  );
 }
