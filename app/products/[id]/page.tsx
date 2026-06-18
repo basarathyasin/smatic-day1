@@ -1,3 +1,5 @@
+import { products } from "@/app/products/page";
+
 interface Props {
 	params: Promise<{
 		id: string;
@@ -11,18 +13,24 @@ export default async function ProductPage({ params }: Props) {
 
 	const { id } = await params;
 	const productId = Number(id);
-	const limit = 200;
 
 	if (Number.isNaN(productId)) {
 		throw new Error("Invalid product ID");
 	}
 
-	if (productId > limit) {
+	const product = products.find((p) => p.id === Number(id));
+
+	if (!product) {
 		throw new Error("Product not found");
 	}
 	return (
 		<div>
-			Product ID: {id} <br />
+			Product Name : {product.name}
+			<br/>
+			Product ID: {id} 
+			<br />
+			Product Price : {product.price}
+			<br />
 			API URL: {apiUrl}
 		</div>
 	);
