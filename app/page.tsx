@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <section className="flex min-h-full items-center justify-center py-6 px-6">
       <div className="max-w-2xl text-center items-center">
-        <h1 className="mb-4 mt-16 text-5xl font-bold tracking-tight sm:text-6xl">
+        <h1 className="mb-4 mt-16 text-5xl font-heading font-heading tracking-tight sm:text-6xl">
           Welcome To Our Store
         </h1>
 
