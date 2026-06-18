@@ -49,11 +49,11 @@ export default function FeaturesSection() {
       <div className="mx-auto max-w-[1280px]">
         {/* Heading */}
         <div className="max-w-[672px]">
-          <h2 className="font-heading text-[32px] leading-[40px] tracking-[-0.64px] text-black">
+          <h2 className="font-heading text-[32px] font-semibold leading-[40px] tracking-[-0.64px] text-black">
             Engineered for velocity.
           </h2>
 
-          <p className="mt-4 text-base leading-2 text-[#585F6C]">
+          <p className="mt-4 text-base leading-6 text-[#585F6C]">
             Everything you need to manage complex infrastructure at any scale,
             without the configuration headache.
           </p>

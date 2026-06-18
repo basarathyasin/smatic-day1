@@ -27,7 +27,7 @@ export default function FaqSection() {
 	return (
 		<section className="px-12 py-[160px]">
 			<div className="mx-auto max-w-[1184px]">
-				<h2 className="mb-20 text-center font-heading text-[34px] font-semibold tracking-[-1.28px] text-[#191C1D]">
+				<h2 className="mb-20 text-center font-heading text-[34px] font-[600] tracking-[-1.28px] text-[#191C1D]">
 					Frequently Asked Questions
 				</h2>
 

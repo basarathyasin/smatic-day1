@@ -6,7 +6,7 @@ export default function CTASection() {
 			<div className="mx-auto max-w-[1280px]">
 				<div className="rounded-[32px] border border-[#CFC4C580] bg-[#F3F4F5] px-6 py-24 md:px-12 md:py-32">
 					<div className="mx-auto flex max-w-[900px] flex-col items-center text-center">
-						<h4 className="font-heading text-[36px] font-semibold leading-[44px] tracking-[-1px] text-[#191C1D] md:text-[48px] md:leading-[56px] md:tracking-[-1.92px]">
+						<h4 className="font-heading text-[48px] font-[700] leading-[44px] tracking-[-1px] text-[#191C1D] md:text-[48px] md:leading-[56px] md:tracking-[-1.92px]">
 							Start building today.
 						</h4>
 

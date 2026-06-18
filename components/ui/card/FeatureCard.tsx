@@ -18,7 +18,7 @@ export function FeatureCard({
         {icon}
       </div>
 
-      <h3 className="mt-3 font-heading  text-[24px] font-light leading-8 tracking-[-0.48px] text-[#191C1D]">
+      <h3 className="mt-3 font-heading  text-[24px] font-600 leading-8 tracking-[-0.48px] text-[#191C1D]">
         {title}
       </h3>
 

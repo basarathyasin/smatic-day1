@@ -44,7 +44,7 @@ export default function PricingSection() {
 		<section className="px-12 pb-20 pt-40">
 			<div className="mx-auto max-w-[1184px]">
 				<div className="mx-auto mb-12 max-w-xl text-center">
-					<h2 className="font-heading text-[32px] font-semibold leading-[40px] tracking-[-0.64px] text-[#191C1D]">
+					<h2 className="font-heading text-[32px] font-[600] leading-[40px] tracking-[-0.64px] text-[#191C1D]">
 						Scalable pricing for scaling teams.
 					</h2>
 
