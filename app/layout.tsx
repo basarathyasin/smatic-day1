@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 
 const geist = Geist({
   subsets: ["latin"],
+  weight: ["600","700"],
+  style:"normal",
   variable: "--font-geist",
 });
 

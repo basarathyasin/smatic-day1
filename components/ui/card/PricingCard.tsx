@@ -1,78 +1,101 @@
 import { Check } from "lucide-react";
-import { Card } from "@/components/ui/card/Card";
 import { Button } from "@/components/ui/button";
+import { Card } from "./Card";
+import { cn } from "@/lib/utils";
 
 interface PricingCardProps {
-  title: string;
-  price: string;
-  description: string;
-  features: string[];
-  buttonText: string;
-  popular?: boolean;
+	name: string;
+	badge?: string;
+	price: string;
+	period?: string;
+	description: string;
+	features: string[];
+	cta: string;
+	variant?: "default" | "featured";
 }
 
 export function PricingCard({
-  title,
-  price,
-  description,
-  features,
-  buttonText,
-  popular,
+	name,
+	badge,
+	price,
+	period,
+	description,
+	features,
+	cta,
+	variant = "default",
 }: PricingCardProps) {
-  return (
-    <Card
-      className={popular ? "bg-black text-white border-black" : ""}
-    >
-      {popular && (
-        <div className="mb-4 inline-flex rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-          Most Popular
-        </div>
-      )}
+	const featured = variant === "featured";
 
-      <h3 className="font-heading text-2xl font-semibold">
-        {title}
-      </h3>
+	return (
+		<Card
+			className={cn(
+				"flex flex-col p-8",
+				featured
+					? "min-h-[560px] border-black bg-black text-white"
+					: "min-h-[520px] bg-white text-[#191C1D]"
+			)}
+		>
+			<div>
+				{badge && (
+					<div className="mb-6 inline-flex rounded-full bg-white/10 px-3 py-1">
+						<span className="font-heading text-xs font-semibold uppercase tracking-[0.6px] text-white">
+							{badge}
+						</span>
+					</div>
+				)}
 
-      <div className="mt-2 flex items-end gap-1">
-        <span className="font-heading text-4xl">
-          {price}
-        </span>
+				<h3 className="font-heading text-2xl font-semibold tracking-[-0.48px]">
+					{name}
+				</h3>
 
-        <span
-          className={
-            popular ? "text-zinc-400" : "text-zinc-500"
-          }
-        >
-          /month
-        </span>
-      </div>
+				<div className="mt-3 flex items-end gap-1">
+					<span className="font-heading text-[48px] leading-none">
+						{price}
+					</span>
 
-      <p
-        className={`mt-4 ${
-          popular ? "text-zinc-400" : "text-zinc-600"
-        }`}
-      >
-        {description}
-      </p>
+					{period && (
+						<span
+							className={cn(
+								"text-base",
+								featured ? "text-zinc-400" : "text-[#585F6C]"
+							)}
+						>
+							{period}
+						</span>
+					)}
+				</div>
 
-      <ul className="my-8 space-y-4">
-        {features.map((feature) => (
-          <li
-            key={feature}
-            className="flex items-center gap-2"
-          >
-            <Check className="size-4" />
-            <span className="text-sm">{feature}</span>
-          </li>
-        ))}
-      </ul>
+				<p
+					className={cn(
+						"mt-6 text-base leading-8",
+						featured ? "text-zinc-400" : "text-[#585F6C]"
+					)}
+				>
+					{description}
+				</p>
+			</div>
 
-      <Button
-        variant={popular ? "secondary" : "outline"}
-        width="full"
-      >
-        {buttonText}
-      </Button>
-    </Card>
-  );
+			<ul className="mt-10 flex-1 space-y-5">
+				{features.map((feature) => (
+					<li
+						key={feature}
+						className="flex items-center gap-3 text-sm"
+					>
+						<Check className="size-4 shrink-0" />
+						<span>{feature}</span>
+					</li>
+				))}
+			</ul>
+
+			<Button
+				variant={featured ? "secondary" : "outline"}
+				className={cn(
+					"mt-8 w-full",
+					featured && "bg-white text-black hover:bg-zinc-100"
+				)}
+			>
+				{cta}
+			</Button>
+		</Card>
+	);
 }

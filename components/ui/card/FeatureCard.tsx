@@ -1,26 +1,28 @@
-import { Card } from "@/components/ui/card/Card";
-import { LucideIcon } from "lucide-react";
+import { ReactNode } from "react";
+import { Card } from "./Card";
 
 interface FeatureCardProps {
-  icon: LucideIcon;
+  icon: ReactNode;
   title: string;
   description: string;
 }
 
 export function FeatureCard({
-  icon: Icon,
+  icon,
   title,
   description,
 }: FeatureCardProps) {
   return (
-    <Card>
-      <Icon className="size-6" />
+    <Card className="p-8">
+      <div className="text-black f">
+        {icon}
+      </div>
 
-      <h3 className="font-heading pt-3 text-2xl font-semibold tracking-tight">
+      <h3 className="mt-3 font-heading  text-[24px] font-light leading-8 tracking-[-0.48px] text-[#191C1D]">
         {title}
       </h3>
 
-      <p className="text-sm leading-5 text-zinc-600">
+      <p className="mt-3 text-sm leading-5 text-[#585F6C]">
         {description}
       </p>
     </Card>
