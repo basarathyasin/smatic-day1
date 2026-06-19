@@ -13,12 +13,12 @@ export default function Footer() {
     </div>
 
     <div className="flex flex-wrap gap-x-12 gap-y-8 items-center text-base text-[#6B7280]">
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms of Service</a>
-      <a href="#">Security</a>
-      <a href="#">Status</a>
-      <a href="#">Twitter</a>
-      <a href="#">LinkedIn</a>
+      <a href="/privacy-policy">Privacy Policy</a>
+      <a href="/terms">Terms of Service</a>
+      <a href="/security">Security</a>
+      <a href="/status">Status</a>
+      <a href="/twitter">Twitter</a>
+      <a href="/linkedin">LinkedIn</a>
     </div>
   </div>
 </footer>

@@ -21,7 +21,7 @@ export default function Home() {
 				}}
 				secondaryAction={{
 					label: "Read Doc",
-					href: "/about",
+					href: "/docs",
 				}}
 			/>
 			<FeaturesSection />
