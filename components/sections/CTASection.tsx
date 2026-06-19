@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export default function CTASection() {
 	return (
-		<section className="py-16 md:px-8 md:py-20">
+		<section id="contact" className="scroll-mt-24 py-16 md:px-8 md:py-20">
 			<div className="mx-auto max-w-[1280px]">
 				<div className="rounded-2xl border border-[#CFC4C580] bg-[#F3F4F5] px-5 py-16 md:rounded-[32px] md:px-12 md:py-32">
 					<div className="mx-auto flex max-w-[900px] flex-col items-center text-center">
