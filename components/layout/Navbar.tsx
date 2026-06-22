@@ -2,7 +2,6 @@
 
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -15,14 +14,9 @@ const links = [
 ];
 
 export default function Navbar() {
-  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
   const closeMenu = () => setIsOpen(false);
-
-  if (pathname === "/login" || pathname === "/signup") {
-    return null;
-  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-zinc-50/80 backdrop-blur-md">

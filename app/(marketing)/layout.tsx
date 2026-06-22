@@ -1,6 +1,6 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import "./global.css";
+import "../global.css";
 
 import { Geist, Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
