@@ -45,7 +45,7 @@ const features = [
 export default function FeaturesSection() {
 
   return (
-    <section className="px-12 py-20">
+    <section id="features" className="scroll-mt-24 py-16 md:px-8 md:py-20">
       <div className="mx-auto max-w-[1280px]">
         {/* Heading */}
         <div className="max-w-[672px]">
