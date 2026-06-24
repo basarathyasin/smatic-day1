@@ -37,8 +37,8 @@ export function DashboardSidebar({
         <SidebarGroup>
           <SidebarGroupLabel>Todo</SidebarGroupLabel>
 
-          <SidebarGroupContent>
-            <SidebarMenu>
+          <SidebarGroupContent >
+            <SidebarMenu className="gap-4" >
               {items.map((item) => (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton asChild tooltip={item.label}>
