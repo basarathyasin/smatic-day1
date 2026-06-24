@@ -1,10 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { Check, Pencil, Plus, Save, Search, Trash2, X } from "lucide-react";
+import { Pencil, Plus, Search, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+	TodoDeleteConfirmDialog,
+	type TodoDeleteConfirmDialogCopy,
+} from "@/components/platform/TodoDeleteConfirmDialog";
 import {
 	TodoTaskDrawer,
 	type TodoTaskDrawerCopy,
@@ -39,6 +43,8 @@ export type TodoTableCopy = {
 	emptyDescription: string;
 	addButton: string;
 	drawer?: Partial<TodoTaskDrawerCopy>;
+	editDrawer?: Partial<TodoTaskDrawerCopy>;
+	deleteDialog?: Partial<TodoDeleteConfirmDialogCopy>;
 };
 
 export type TodoTableClassNames = {
@@ -51,10 +57,9 @@ export type TodoTableClassNames = {
 export type TodoTableProps = {
 	initialTodos?: TodoItem[];
 	copy?: Partial<TodoTableCopy>;
-	statusOptions?: Array<{ label: string; value: TodoStatus }>;
 	priorityOptions?: Array<{ label: string; value: TodoPriority }>;
 	visibleColumns?: Array<
-		"task" | "status" | "priority" | "dueDate" | "actions"
+		"completed" | "task" | "priority" | "dueDate" | "actions"
 	>;
 	classNames?: TodoTableClassNames;
 	onTodosChange?: (todos: TodoItem[]) => void;
@@ -68,12 +73,6 @@ const defaultCopy: TodoTableCopy = {
 	emptyDescription: "Add your first task to start organizing the day.",
 	addButton: "Add task",
 };
-
-const defaultStatusOptions: NonNullable<TodoTableProps["statusOptions"]> = [
-	{ label: "Todo", value: "todo" },
-	{ label: "In progress", value: "in-progress" },
-	{ label: "Done", value: "done" },
-];
 
 const defaultPriorityOptions: NonNullable<TodoTableProps["priorityOptions"]> = [
 	{ label: "Low", value: "low" },
@@ -106,8 +105,8 @@ const defaultTodos: TodoItem[] = [
 ];
 
 const defaultVisibleColumns: NonNullable<TodoTableProps["visibleColumns"]> = [
+	"completed",
 	"task",
-	"status",
 	"priority",
 	"dueDate",
 	"actions",
@@ -117,7 +116,7 @@ function createTodo(values: TodoTaskDrawerValues): TodoItem {
 	return {
 		id: `todo-${Date.now()}`,
 		title: values.title,
-		status: values.status,
+		status: "todo",
 		priority: values.priority,
 		dueDate: values.dueDate,
 	};
@@ -126,7 +125,6 @@ function createTodo(values: TodoTaskDrawerValues): TodoItem {
 export function TodoTable({
 	initialTodos = defaultTodos,
 	copy,
-	statusOptions = defaultStatusOptions,
 	priorityOptions = defaultPriorityOptions,
 	visibleColumns = defaultVisibleColumns,
 	classNames,
@@ -137,7 +135,9 @@ export function TodoTable({
 	const [query, setQuery] = React.useState("");
 	const [isCreateOpen, setIsCreateOpen] = React.useState(false);
 	const [editingId, setEditingId] = React.useState<string | null>(null);
-	const [editingTitle, setEditingTitle] = React.useState("");
+	const [deleteTargetId, setDeleteTargetId] = React.useState<string | null>(
+		null,
+	);
 
 	const columns = React.useMemo(
 		() => new Set(visibleColumns),
@@ -156,6 +156,21 @@ export function TodoTable({
 		todo.title.toLowerCase().includes(query.trim().toLowerCase()),
 	);
 
+	const editingTodo = todos.find((todo) => todo.id === editingId);
+	const deleteTarget = todos.find((todo) => todo.id === deleteTargetId);
+
+	const editDrawerValues = React.useMemo(
+		() =>
+			editingTodo
+				? {
+						title: editingTodo.title,
+						priority: editingTodo.priority,
+						dueDate: editingTodo.dueDate,
+					}
+				: undefined,
+		[editingTodo],
+	);
+
 	const addTodo = (values: TodoTaskDrawerValues) => {
 		updateTodos([createTodo(values), ...todos]);
 	};
@@ -170,24 +185,30 @@ export function TodoTable({
 		updateTodos(todos.filter((todo) => todo.id !== id));
 	};
 
-	const startEditing = (todo: TodoItem) => {
-		setEditingId(todo.id);
-		setEditingTitle(todo.title);
+	const editTodo = (values: TodoTaskDrawerValues) => {
+		if (!editingTodo) return;
+		updateTodo(editingTodo.id, {
+			title: values.title,
+			priority: values.priority,
+			dueDate: values.dueDate,
+		});
+		setEditingId(null);
 	};
 
-	const saveEditing = () => {
-		if (!editingId) return;
-		const title = editingTitle.trim();
-		if (!title) return;
-		updateTodo(editingId, { title });
-		setEditingId(null);
-		setEditingTitle("");
+	const confirmDelete = () => {
+		if (!deleteTarget) return;
+		deleteTodo(deleteTarget.id);
+		setDeleteTargetId(null);
 	};
 
-	const cancelEditing = () => {
-		setEditingId(null);
-		setEditingTitle("");
+	const handleEditDrawerOpenChange = (open: boolean) => {
+		if (!open) {
+			setEditingId(null);
+		}
 	};
+
+	const getPriorityLabel = (priority: TodoPriority) =>
+		priorityOptions.find((option) => option.value === priority)?.label ?? priority;
 
 	return (
 		<section className={cn("space-y-5", classNames?.root)}>
@@ -196,8 +217,31 @@ export function TodoTable({
 				onOpenChange={setIsCreateOpen}
 				onSubmit={addTodo}
 				copy={text.drawer}
-				statusOptions={statusOptions}
 				priorityOptions={priorityOptions}
+			/>
+			<TodoTaskDrawer
+				key={editingTodo?.id ?? "edit-task-drawer"}
+				open={Boolean(editingTodo)}
+				onOpenChange={handleEditDrawerOpenChange}
+				onSubmit={editTodo}
+				copy={{
+					title: "Edit task",
+					submitButton: "Save task",
+					...text.editDrawer,
+				}}
+				priorityOptions={priorityOptions}
+				defaultValues={editDrawerValues}
+			/>
+			<TodoDeleteConfirmDialog
+				open={Boolean(deleteTarget)}
+				onOpenChange={(open) => {
+					if (!open) {
+						setDeleteTargetId(null);
+					}
+				}}
+				onConfirm={confirmDelete}
+				taskTitle={deleteTarget?.title}
+				copy={text.deleteDialog}
 			/>
 
 			<div
@@ -245,10 +289,12 @@ export function TodoTable({
 				<Table>
 					<TableHeader>
 						<TableRow>
+							{columns.has("completed") && (
+								<TableHead className="w-12 px-4">Done</TableHead>
+							)}
 							{columns.has("task") && (
 								<TableHead className="min-w-[260px] px-4">Task</TableHead>
 							)}
-							{columns.has("status") && <TableHead>Status</TableHead>}
 							{columns.has("priority") && <TableHead>Priority</TableHead>}
 							{columns.has("dueDate") && <TableHead>Due date</TableHead>}
 							{columns.has("actions") && (
@@ -276,154 +322,81 @@ export function TodoTable({
 							</TableRow>
 						) : (
 							filteredTodos.map((todo) => {
-								const isEditing = editingId === todo.id;
-
 								return (
 									<TableRow key={todo.id} className={classNames?.row}>
-										{columns.has("task") && (
+										{columns.has("completed") && (
 											<TableCell className="px-4">
-												{isEditing ? (
-													<Input
-														value={editingTitle}
-														onChange={(event) =>
-															setEditingTitle(event.target.value)
-														}
-														onKeyDown={(event) => {
-															if (event.key === "Enter") saveEditing();
-															if (event.key === "Escape") cancelEditing();
-														}}
-														autoFocus
-													/>
-												) : (
-													<span
-														className={cn(
-															"font-medium text-[#191C1D]",
-															todo.status === "done" &&
-																"text-muted-foreground line-through",
-														)}
-													>
-														{todo.title}
-													</span>
-												)}
+												<input
+													type="checkbox"
+													checked={todo.status === "done"}
+													onChange={(event) =>
+														updateTodo(todo.id, {
+															status: event.target.checked ? "done" : "todo",
+														})
+													}
+													aria-label={
+														todo.status === "done"
+															? "Mark task todo"
+															: "Mark task done"
+													}
+													className="size-4 rounded border-input accent-[#191C1D]"
+												/>
 											</TableCell>
 										)}
 
-										{columns.has("status") && (
-											<TableCell>
-												<select
-													value={todo.status}
-													onChange={(event) =>
-														updateTodo(todo.id, {
-															status: event.target.value as TodoStatus,
-														})
-													}
-													className="h-8 rounded-lg border border-input bg-transparent px-2 text-sm"
+										{columns.has("task") && (
+											<TableCell className="px-4">
+												<span
+													className={cn(
+														"font-medium text-[#191C1D]",
+														todo.status === "done" &&
+															"text-muted-foreground line-through",
+													)}
 												>
-													{statusOptions.map((option) => (
-														<option key={option.value} value={option.value}>
-															{option.label}
-														</option>
-													))}
-												</select>
+													{todo.title}
+												</span>
 											</TableCell>
 										)}
 
 										{columns.has("priority") && (
 											<TableCell>
-												<select
-													value={todo.priority}
-													onChange={(event) =>
-														updateTodo(todo.id, {
-															priority: event.target.value as TodoPriority,
-														})
-													}
-													className="h-8 rounded-lg border border-input bg-transparent px-2 text-sm capitalize"
-												>
-													{priorityOptions.map((option) => (
-														<option key={option.value} value={option.value}>
-															{option.label}
-														</option>
-													))}
-												</select>
+												<span className="text-sm text-[#191C1D]">
+													{getPriorityLabel(todo.priority)}
+												</span>
 											</TableCell>
 										)}
 
 										{columns.has("dueDate") && (
 											<TableCell>
-												<Input
-													type="date"
-													value={todo.dueDate ?? ""}
-													onChange={(event) =>
-														updateTodo(todo.id, { dueDate: event.target.value })
-													}
-													className="w-40"
-												/>
+												<span className="text-sm text-[#191C1D]">
+													{todo.dueDate || "No date"}
+												</span>
 											</TableCell>
 										)}
 
 										{columns.has("actions") && (
 											<TableCell className="text-right">
-												<div className="flex justify-end gap-1">
-													{isEditing ? (
-														<>
-															<Button
-																type="button"
-																size="icon-xs"
-																onClick={saveEditing}
-																aria-label="Save task"
-															>
-																<Save className="size-4" />
-															</Button>
-															<Button
-																type="button"
-																size="icon-xs"
-																variant="ghost"
-																onClick={cancelEditing}
-																aria-label="Cancel editing"
-															>
-																<X className="size-4" />
-															</Button>
-														</>
-													) : (
-														<>
-															<Button
-																type="button"
-																size="icon-xs"
-																variant="ghost"
-																onClick={() =>
-																	updateTodo(todo.id, {
-																		status:
-																			todo.status === "done" ? "todo" : "done",
-																	})
-																}
-																aria-label={
-																	todo.status === "done"
-																		? "Mark task todo"
-																		: "Mark task done"
-																}
-															>
-																<Check className="size-4" />
-															</Button>
-															<Button
-																type="button"
-																size="icon-xs"
-																variant="ghost"
-																onClick={() => startEditing(todo)}
-																aria-label="Edit task"
-															>
-																<Pencil className="size-4" />
-															</Button>
-															<Button
-																type="button"
-																size="icon-xs"
-																variant="ghost"
-																onClick={() => deleteTodo(todo.id)}
-																aria-label="Delete task"
-															>
-																<Trash2 className="size-4" />
-															</Button>
-														</>
-													)}
+												<div className="ml-auto flex w-fit items-center gap-2 rounded-xl border border-[#E5E7EB] bg-[#F8FAFC] p-1">
+													<Button
+														type="button"
+														size="icon-xs"
+														variant="secondary"
+														className="size-9 rounded-lg border border-[#93C5FD] bg-[#DBEAFE] p-2 text-[#075985] shadow-none hover:bg-[#BFDBFE]"
+														onClick={() => setEditingId(todo.id)}
+														aria-label="Edit task"
+													>
+														<Pencil className="size-4" />
+													</Button>
+													<Button
+														type="button"
+														size="icon-xs"
+														variant="destructive"
+														className="size-9 rounded-lg border border-[#FCA5A5] bg-[#FEE2E2] p-2 text-[#B91C1C] shadow-none hover:bg-[#FECACA]"
+														onClick={() => setDeleteTargetId(todo.id)}
+														aria-label="Delete task"
+													>
+														<Trash2 className="size-4" />
+													</Button>
 												</div>
 											</TableCell>
 										)}

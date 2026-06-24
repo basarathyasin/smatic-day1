@@ -12,12 +12,19 @@ import {
 	DrawerTitle,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
+import {
+	TodoDatePicker,
+	type TodoDatePickerCopy,
+} from "@/components/platform/TodoDatePicker";
+import {
+	TodoPrioritySelect,
+	type TodoPriorityOption,
+} from "@/components/platform/TodoPrioritySelect";
 import { cn } from "@/lib/utils";
-import type { TodoPriority, TodoStatus } from "@/components/platform/TodoTable";
+import type { TodoPriority } from "@/components/platform/TodoTable";
 
 export type TodoTaskDrawerValues = {
 	title: string;
-	status: TodoStatus;
 	priority: TodoPriority;
 	dueDate?: string;
 };
@@ -26,11 +33,10 @@ export type TodoTaskDrawerCopy = {
 	title: string;
 	titleLabel: string;
 	titlePlaceholder: string;
-	statusLabel: string;
 	priorityLabel: string;
-	dueDateLabel: string;
 	cancelButton: string;
 	submitButton: string;
+	datePicker?: Partial<TodoDatePickerCopy>;
 };
 
 export type TodoTaskDrawerClassNames = {
@@ -44,8 +50,7 @@ export type TodoTaskDrawerProps = {
 	onOpenChange: (open: boolean) => void;
 	onSubmit: (values: TodoTaskDrawerValues) => void;
 	copy?: Partial<TodoTaskDrawerCopy>;
-	statusOptions: Array<{ label: string; value: TodoStatus }>;
-	priorityOptions: Array<{ label: string; value: TodoPriority }>;
+	priorityOptions: TodoPriorityOption[];
 	defaultValues?: Partial<TodoTaskDrawerValues>;
 	classNames?: TodoTaskDrawerClassNames;
 };
@@ -54,9 +59,7 @@ const defaultCopy: TodoTaskDrawerCopy = {
 	title: "Add task",
 	titleLabel: "Task title",
 	titlePlaceholder: "Write the task title",
-	statusLabel: "Status",
 	priorityLabel: "Priority",
-	dueDateLabel: "Due date",
 	cancelButton: "Cancel",
 	submitButton: "Create task",
 };
@@ -66,7 +69,6 @@ function getInitialValues(
 ): TodoTaskDrawerValues {
 	return {
 		title: defaultValues?.title ?? "",
-		status: defaultValues?.status ?? "todo",
 		priority: defaultValues?.priority ?? "medium",
 		dueDate: defaultValues?.dueDate ?? "",
 	};
@@ -77,13 +79,11 @@ export function TodoTaskDrawer({
 	onOpenChange,
 	onSubmit,
 	copy,
-	statusOptions,
 	priorityOptions,
 	defaultValues,
 	classNames,
 }: TodoTaskDrawerProps) {
 	const text = { ...defaultCopy, ...copy };
-	const dueDateInputRef = React.useRef<HTMLInputElement>(null);
 	const [values, setValues] = React.useState<TodoTaskDrawerValues>(() =>
 		getInitialValues(defaultValues),
 	);
@@ -116,16 +116,6 @@ export function TodoTaskDrawer({
 		onOpenChange(false);
 	};
 
-	const openDatePicker = () => {
-		const input = dueDateInputRef.current;
-		if (!input) return;
-
-		input.focus();
-		if (typeof input.showPicker === "function") {
-			input.showPicker();
-		}
-	};
-
 	return (
 		<Drawer direction="right" open={open} onOpenChange={handleOpenChange}>
 			<DrawerContent className={cn("w-[min(420px,92vw)]", classNames?.content)}>
@@ -149,58 +139,20 @@ export function TodoTaskDrawer({
 							/>
 						</label>
 
-						<div className="grid gap-4 sm:grid-cols-2">
-							<label className={cn("block space-y-2", classNames?.field)}>
-								<span className="text-sm font-medium text-[#191C1D]">
-									{text.statusLabel}
-								</span>
-								<select
-									value={values.status}
-									onChange={(event) =>
-										updateValue("status", event.target.value as TodoStatus)
-									}
-									className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-								>
-									{statusOptions.map((option) => (
-										<option key={option.value} value={option.value}>
-											{option.label}
-										</option>
-									))}
-								</select>
-							</label>
+						<TodoPrioritySelect
+							value={values.priority}
+							onChange={(priority) => updateValue("priority", priority)}
+							options={priorityOptions}
+							label={text.priorityLabel}
+							className={classNames?.field}
+						/>
 
-							<label className={cn("block space-y-2", classNames?.field)}>
-								<span className="text-sm font-medium text-[#191C1D]">
-									{text.priorityLabel}
-								</span>
-								<select
-									value={values.priority}
-									onChange={(event) =>
-										updateValue("priority", event.target.value as TodoPriority)
-									}
-									className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-								>
-									{priorityOptions.map((option) => (
-										<option key={option.value} value={option.value}>
-											{option.label}
-										</option>
-									))}
-								</select>
-							</label>
-						</div>
-
-						<label className={cn("block space-y-2", classNames?.field)}>
-							<span className="text-sm font-medium text-[#191C1D]">
-								{text.dueDateLabel}
-							</span>
-							<Input
-								ref={dueDateInputRef}
-								type="date"
-								value={values.dueDate ?? ""}
-								onChange={(event) => updateValue("dueDate", event.target.value)}
-								onClick={openDatePicker}
-							/>
-						</label>
+						<TodoDatePicker
+							value={values.dueDate}
+							onChange={(dueDate) => updateValue("dueDate", dueDate)}
+							copy={text.datePicker}
+							className={classNames?.field}
+						/>
 					</div>
 
 					<DrawerFooter
