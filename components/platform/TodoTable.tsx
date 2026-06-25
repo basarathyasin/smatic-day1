@@ -16,10 +16,11 @@ import {
 	type TodoToastTone,
 } from "@/components/platform/TodoToastStack";
 import {
-	TodoTaskDrawer,
-	type TodoTaskDrawerCopy,
-	type TodoTaskDrawerValues,
-} from "@/components/platform/TodoTaskDrawer";
+	TodoTaskForm,
+	type TodoTaskFormCopy,
+	type TodoTaskFormValues,
+} from "@/components/platform/TodoTaskForm";
+import { TodoTaskDrawer } from "@/components/platform/TodoTaskDrawer";
 import {
 	Table,
 	TableBody,
@@ -59,8 +60,10 @@ export type TodoTableCopy = {
 	emptyTitle: string;
 	emptyDescription: string;
 	addButton: string;
-	drawer?: Partial<TodoTaskDrawerCopy>;
-	editDrawer?: Partial<TodoTaskDrawerCopy>;
+	drawerTitle: string;
+	editDrawerTitle: string;
+	form?: Partial<TodoTaskFormCopy>;
+	editForm?: Partial<TodoTaskFormCopy>;
 	deleteDialog?: Partial<TodoDeleteConfirmDialogCopy>;
 	toast?: Partial<TodoTableToastCopy>;
 };
@@ -91,6 +94,8 @@ const defaultCopy: TodoTableCopy = {
 	emptyTitle: "No tasks yet",
 	emptyDescription: "Add your first task to start organizing the day.",
 	addButton: "Add task",
+	drawerTitle: "Add task",
+	editDrawerTitle: "Edit task",
 	toast: {
 		deletedTitle: "Task deleted",
 		deletedDescription: "The task was removed from your list.",
@@ -152,7 +157,7 @@ const defaultVisibleColumns: NonNullable<TodoTableProps["visibleColumns"]> = [
 	"actions",
 ];
 
-function createTodo(values: TodoTaskDrawerValues): TodoItem {
+function createTodo(values: TodoTaskFormValues): TodoItem {
 	return {
 		id: `todo-${Date.now()}`,
 		title: values.title,
@@ -180,7 +185,9 @@ export function TodoTable({
 	};
 	const [todos, setTodos] = React.useState<TodoItem[]>(initialTodos);
 	const [query, setQuery] = React.useState("");
-	const [isCreateOpen, setIsCreateOpen] = React.useState(false);
+	const [drawerMode, setDrawerMode] = React.useState<"create" | "edit" | null>(
+		null,
+	);
 	const [editingId, setEditingId] = React.useState<string | null>(null);
 	const [deleteTargetId, setDeleteTargetId] = React.useState<string | null>(
 		null,
@@ -230,8 +237,24 @@ export function TodoTable({
 		[editingTodo],
 	);
 
-	const addTodo = (values: TodoTaskDrawerValues) => {
+	const closeTaskDrawer = () => {
+		setDrawerMode(null);
+		setEditingId(null);
+	};
+
+	const openCreateDrawer = () => {
+		setDrawerMode("create");
+		setEditingId(null);
+	};
+
+	const openEditDrawer = (id: string) => {
+		setEditingId(id);
+		setDrawerMode("edit");
+	};
+
+	const addTodo = (values: TodoTaskFormValues) => {
 		updateTodos([createTodo(values), ...todos]);
+		closeTaskDrawer();
 	};
 
 	const addToast = (
@@ -263,64 +286,57 @@ export function TodoTable({
 		updateTodos(todos.filter((todo) => todo.id !== id));
 	};
 
-	const editTodo = (values: TodoTaskDrawerValues) => {
+	const editTodo = (values: TodoTaskFormValues) => {
 		if (!editingTodo) return;
 		updateTodo(editingTodo.id, {
 			title: values.title,
 			priority: values.priority,
 			dueDate: values.dueDate,
 		});
-		setEditingId(null);
-		addToast(
-			text.toast.updatedTitle,
-			text.toast.updatedDescription,
-			"success",
-		);
+		closeTaskDrawer();
+		addToast(text.toast.updatedTitle, text.toast.updatedDescription, "success");
 	};
 
 	const confirmDelete = () => {
 		if (!deleteTarget) return;
 		deleteTodo(deleteTarget.id);
 		setDeleteTargetId(null);
-		addToast(
-			text.toast.deletedTitle,
-			text.toast.deletedDescription,
-			"danger",
-		);
+		addToast(text.toast.deletedTitle, text.toast.deletedDescription, "danger");
 	};
 
 	const handleEditDrawerOpenChange = (open: boolean) => {
 		if (!open) {
-			setEditingId(null);
+			closeTaskDrawer();
 		}
 	};
 
 	const getPriorityLabel = (priority: TodoPriority) =>
-		priorityOptions.find((option) => option.value === priority)?.label ?? priority;
+		priorityOptions.find((option) => option.value === priority)?.label ??
+		priority;
 
 	return (
 		<section className={cn("space-y-5", classNames?.root)}>
 			<TodoToastStack toasts={toasts} classNames={classNames?.toasts} />
 			<TodoTaskDrawer
-				open={isCreateOpen}
-				onOpenChange={setIsCreateOpen}
-				onSubmit={addTodo}
-				copy={text.drawer}
-				priorityOptions={priorityOptions}
-			/>
-			<TodoTaskDrawer
-				key={editingTodo?.id ?? "edit-task-drawer"}
-				open={Boolean(editingTodo)}
+				open={drawerMode !== null}
 				onOpenChange={handleEditDrawerOpenChange}
-				onSubmit={editTodo}
-				copy={{
-					title: "Edit task",
-					submitButton: "Save task",
-					...text.editDrawer,
-				}}
-				priorityOptions={priorityOptions}
-				defaultValues={editDrawerValues}
-			/>
+				title={
+					drawerMode === "edit" ? text.editDrawerTitle : text.drawerTitle
+				}
+			>
+				<TodoTaskForm
+					key={drawerMode === "edit" ? editingTodo?.id : "create-task-form"}
+					onSubmit={drawerMode === "edit" ? editTodo : addTodo}
+					onCancel={closeTaskDrawer}
+					copy={{
+						...(drawerMode === "edit"
+							? { submitButton: "Save task", ...text.editForm }
+							: text.form),
+					}}
+					priorityOptions={priorityOptions}
+					defaultValues={drawerMode === "edit" ? editDrawerValues : undefined}
+				/>
+			</TodoTaskDrawer>
 			<TodoDeleteConfirmDialog
 				open={Boolean(deleteTarget)}
 				onOpenChange={(open) => {
@@ -360,7 +376,7 @@ export function TodoTable({
 					<Button
 						type="button"
 						size="sm"
-						onClick={() => setIsCreateOpen(true)}
+						onClick={openCreateDrawer}
 						className="gap-2"
 					>
 						<Plus className="size-4" />
@@ -481,7 +497,7 @@ export function TodoTable({
 														size="icon-xs"
 														variant="secondary"
 														className="size-9 rounded-lg border border-[#93C5FD] bg-[#DBEAFE] p-2 text-[#075985] shadow-none hover:bg-[#BFDBFE]"
-														onClick={() => setEditingId(todo.id)}
+														onClick={() => openEditDrawer(todo.id)}
 														aria-label="Edit task"
 													>
 														<Pencil className="size-4" />
