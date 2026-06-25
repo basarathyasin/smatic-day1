@@ -1,6 +1,9 @@
 "use client";
 
 import * as React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -64,13 +67,33 @@ const defaultCopy: TodoTaskDrawerCopy = {
 	submitButton: "Create task",
 };
 
+const todoTaskDrawerSchema = z.object({
+	title: z.string().trim().min(1, "Title is required"),
+	priority: z.enum(["low", "medium", "high"]),
+	dueDate: z
+		.string()
+		.optional()
+		.refine(
+			(value) => !value || value >= getTodayDateValue(),
+			"Date cannot be in the past",
+		),
+});
+
+function getTodayDateValue() {
+	const today = new Date();
+	const year = today.getFullYear();
+	const month = String(today.getMonth() + 1).padStart(2, "0");
+	const day = String(today.getDate()).padStart(2, "0");
+	return `${year}-${month}-${day}`;
+}
+
 function getInitialValues(
 	defaultValues?: Partial<TodoTaskDrawerValues>,
 ): TodoTaskDrawerValues {
 	return {
 		title: defaultValues?.title ?? "",
 		priority: defaultValues?.priority ?? "medium",
-		dueDate: defaultValues?.dueDate ?? "",
+		dueDate: defaultValues?.dueDate,
 	};
 }
 
@@ -84,42 +107,38 @@ export function TodoTaskDrawer({
 	classNames,
 }: TodoTaskDrawerProps) {
 	const text = { ...defaultCopy, ...copy };
-	const [values, setValues] = React.useState<TodoTaskDrawerValues>(() =>
-		getInitialValues(defaultValues),
-	);
+	const {
+		control,
+		formState: { errors },
+		handleSubmit,
+		register,
+		reset,
+	} = useForm<TodoTaskDrawerValues>({
+		defaultValues: getInitialValues(defaultValues),
+		resolver: zodResolver(todoTaskDrawerSchema),
+	});
 
 	const handleOpenChange = (nextOpen: boolean) => {
 		if (!nextOpen) {
-			setValues(getInitialValues(defaultValues));
+			reset(getInitialValues(defaultValues));
 		}
 		onOpenChange(nextOpen);
 	};
 
-	const updateValue = <Key extends keyof TodoTaskDrawerValues>(
-		key: Key,
-		value: TodoTaskDrawerValues[Key],
-	) => {
-		setValues((current) => ({ ...current, [key]: value }));
-	};
-
-	const submitTask = (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		const title = values.title.trim();
-		if (!title) return;
-
+	const submitTask = (values: TodoTaskDrawerValues) => {
 		onSubmit({
 			...values,
-			title,
+			title: values.title.trim(),
 			dueDate: values.dueDate || undefined,
 		});
-		setValues(getInitialValues(defaultValues));
+		reset(getInitialValues(defaultValues));
 		onOpenChange(false);
 	};
 
 	return (
 		<Drawer direction="right" open={open} onOpenChange={handleOpenChange}>
 			<DrawerContent className={cn("w-[min(420px,92vw)]", classNames?.content)}>
-				<form onSubmit={submitTask} className="flex h-full flex-col">
+				<form onSubmit={handleSubmit(submitTask)} className="flex h-full flex-col">
 					<DrawerHeader className="border-b px-5 py-5 text-left">
 						<DrawerTitle className="text-lg font-semibold">
 							{text.title}
@@ -132,26 +151,42 @@ export function TodoTaskDrawer({
 								{text.titleLabel}
 							</span>
 							<Input
-								value={values.title}
-								onChange={(event) => updateValue("title", event.target.value)}
 								placeholder={text.titlePlaceholder}
 								autoFocus
+								aria-invalid={Boolean(errors.title)}
+								{...register("title")}
 							/>
+							{errors.title && (
+								<p className="text-sm text-red-600">{errors.title.message}</p>
+							)}
 						</label>
 
-						<TodoPrioritySelect
-							value={values.priority}
-							onChange={(priority) => updateValue("priority", priority)}
-							options={priorityOptions}
-							label={text.priorityLabel}
-							className={classNames?.field}
+						<Controller
+							control={control}
+							name="priority"
+							render={({ field }) => (
+								<TodoPrioritySelect
+									value={field.value}
+									onChange={field.onChange}
+									options={priorityOptions}
+									label={text.priorityLabel}
+									className={classNames?.field}
+								/>
+							)}
 						/>
 
-						<TodoDatePicker
-							value={values.dueDate}
-							onChange={(dueDate) => updateValue("dueDate", dueDate)}
-							copy={text.datePicker}
-							className={classNames?.field}
+						<Controller
+							control={control}
+							name="dueDate"
+							render={({ field }) => (
+								<TodoDatePicker
+									value={field.value}
+									onChange={field.onChange}
+									copy={text.datePicker}
+									className={classNames?.field}
+									error={errors.dueDate?.message}
+								/>
+							)}
 						/>
 					</div>
 

@@ -28,6 +28,7 @@ export type TodoDatePickerProps = {
 	copy?: Partial<TodoDatePickerCopy>;
 	className?: string;
 	buttonClassName?: string;
+	error?: string;
 };
 
 const defaultCopy: TodoDatePickerCopy = {
@@ -59,6 +60,7 @@ export function TodoDatePicker({
 	copy,
 	className,
 	buttonClassName,
+	error,
 }: TodoDatePickerProps) {
 	const text = { ...defaultCopy, ...copy };
 	const [open, setOpen] = React.useState(false);
@@ -75,6 +77,7 @@ export function TodoDatePicker({
 				className={cn(
 					"h-8 w-full justify-between rounded-lg px-2.5 font-normal",
 					!value && "text-muted-foreground",
+					error && "border-red-500",
 					buttonClassName,
 				)}
 				onClick={() => setOpen(true)}
@@ -108,6 +111,7 @@ export function TodoDatePicker({
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
+			{error && <p className="text-sm text-red-600">{error}</p>}
 		</div>
 	);
 }

@@ -10,6 +10,12 @@ import {
 	type TodoDeleteConfirmDialogCopy,
 } from "@/components/platform/TodoDeleteConfirmDialog";
 import {
+	TodoToastStack,
+	type TodoToastItem,
+	type TodoToastStackClassNames,
+	type TodoToastTone,
+} from "@/components/platform/TodoToastStack";
+import {
 	TodoTaskDrawer,
 	type TodoTaskDrawerCopy,
 	type TodoTaskDrawerValues,
@@ -35,6 +41,17 @@ export type TodoItem = {
 	dueDate?: string;
 };
 
+export type TodoTableToastCopy = {
+	deletedTitle: string;
+	deletedDescription: string;
+	completedTitle: string;
+	completedDescription: string;
+	reopenedTitle: string;
+	reopenedDescription: string;
+	updatedTitle: string;
+	updatedDescription: string;
+};
+
 export type TodoTableCopy = {
 	title: string;
 	subtitle: string;
@@ -45,6 +62,7 @@ export type TodoTableCopy = {
 	drawer?: Partial<TodoTaskDrawerCopy>;
 	editDrawer?: Partial<TodoTaskDrawerCopy>;
 	deleteDialog?: Partial<TodoDeleteConfirmDialogCopy>;
+	toast?: Partial<TodoTableToastCopy>;
 };
 
 export type TodoTableClassNames = {
@@ -52,6 +70,7 @@ export type TodoTableClassNames = {
 	header?: string;
 	tableShell?: string;
 	row?: string;
+	toasts?: TodoToastStackClassNames;
 };
 
 export type TodoTableProps = {
@@ -72,6 +91,27 @@ const defaultCopy: TodoTableCopy = {
 	emptyTitle: "No tasks yet",
 	emptyDescription: "Add your first task to start organizing the day.",
 	addButton: "Add task",
+	toast: {
+		deletedTitle: "Task deleted",
+		deletedDescription: "The task was removed from your list.",
+		completedTitle: "Task completed",
+		completedDescription: "Nice, that task is now marked done.",
+		reopenedTitle: "Task reopened",
+		reopenedDescription: "The task is back in your to-do list.",
+		updatedTitle: "Task updated",
+		updatedDescription: "Your task details were saved.",
+	},
+};
+
+const defaultToastCopy: TodoTableToastCopy = {
+	deletedTitle: "Task deleted",
+	deletedDescription: "The task was removed from your list.",
+	completedTitle: "Task completed",
+	completedDescription: "Nice, that task is now marked done.",
+	reopenedTitle: "Task reopened",
+	reopenedDescription: "The task is back in your to-do list.",
+	updatedTitle: "Task updated",
+	updatedDescription: "Your task details were saved.",
 };
 
 const defaultPriorityOptions: NonNullable<TodoTableProps["priorityOptions"]> = [
@@ -130,7 +170,14 @@ export function TodoTable({
 	classNames,
 	onTodosChange,
 }: TodoTableProps) {
-	const text = { ...defaultCopy, ...copy };
+	const text = {
+		...defaultCopy,
+		...copy,
+		toast: {
+			...defaultToastCopy,
+			...copy?.toast,
+		},
+	};
 	const [todos, setTodos] = React.useState<TodoItem[]>(initialTodos);
 	const [query, setQuery] = React.useState("");
 	const [isCreateOpen, setIsCreateOpen] = React.useState(false);
@@ -138,6 +185,18 @@ export function TodoTable({
 	const [deleteTargetId, setDeleteTargetId] = React.useState<string | null>(
 		null,
 	);
+	const [toasts, setToasts] = React.useState<TodoToastItem[]>([]);
+	const toastTimeoutsRef = React.useRef<Array<ReturnType<typeof setTimeout>>>(
+		[],
+	);
+
+	React.useEffect(() => {
+		const toastTimeouts = toastTimeoutsRef.current;
+
+		return () => {
+			toastTimeouts.forEach(clearTimeout);
+		};
+	}, []);
 
 	const columns = React.useMemo(
 		() => new Set(visibleColumns),
@@ -175,6 +234,25 @@ export function TodoTable({
 		updateTodos([createTodo(values), ...todos]);
 	};
 
+	const addToast = (
+		title: string,
+		description: string,
+		tone: TodoToastTone = "success",
+	) => {
+		const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+		setToasts((currentToasts) => [
+			...currentToasts,
+			{ id, title, description, tone },
+		]);
+
+		const timeout = setTimeout(() => {
+			setToasts((currentToasts) =>
+				currentToasts.filter((toast) => toast.id !== id),
+			);
+		}, 3000);
+		toastTimeoutsRef.current.push(timeout);
+	};
+
 	const updateTodo = (id: string, patch: Partial<TodoItem>) => {
 		updateTodos(
 			todos.map((todo) => (todo.id === id ? { ...todo, ...patch } : todo)),
@@ -193,12 +271,22 @@ export function TodoTable({
 			dueDate: values.dueDate,
 		});
 		setEditingId(null);
+		addToast(
+			text.toast.updatedTitle,
+			text.toast.updatedDescription,
+			"success",
+		);
 	};
 
 	const confirmDelete = () => {
 		if (!deleteTarget) return;
 		deleteTodo(deleteTarget.id);
 		setDeleteTargetId(null);
+		addToast(
+			text.toast.deletedTitle,
+			text.toast.deletedDescription,
+			"danger",
+		);
 	};
 
 	const handleEditDrawerOpenChange = (open: boolean) => {
@@ -212,6 +300,7 @@ export function TodoTable({
 
 	return (
 		<section className={cn("space-y-5", classNames?.root)}>
+			<TodoToastStack toasts={toasts} classNames={classNames?.toasts} />
 			<TodoTaskDrawer
 				open={isCreateOpen}
 				onOpenChange={setIsCreateOpen}
@@ -329,11 +418,21 @@ export function TodoTable({
 												<input
 													type="checkbox"
 													checked={todo.status === "done"}
-													onChange={(event) =>
+													onChange={(event) => {
+														const isDone = event.target.checked;
 														updateTodo(todo.id, {
-															status: event.target.checked ? "done" : "todo",
-														})
-													}
+															status: isDone ? "done" : "todo",
+														});
+														addToast(
+															isDone
+																? text.toast.completedTitle
+																: text.toast.reopenedTitle,
+															isDone
+																? text.toast.completedDescription
+																: text.toast.reopenedDescription,
+															isDone ? "success" : "info",
+														);
+													}}
 													aria-label={
 														todo.status === "done"
 															? "Mark task todo"
