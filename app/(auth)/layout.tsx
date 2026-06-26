@@ -21,8 +21,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={cn(geist.variable, inter.variable)}>
-      <body className="min-h-screen flex flex-col">
-        <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 pb-24 pt-16 sm:px-6 md:px-8 md:pb-40 md:pt-24">
+      <body className="flex min-h-screen flex-col bg-[#F8FAFC]">
+        <main className="flex w-full flex-1 items-center justify-center px-4 py-6">
           {children}
         </main>
 
