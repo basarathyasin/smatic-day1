@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import footerBackground from "@/public/hero.png";
+import footerBackground from "@/public/bg.png";
 
 export default function Footer() {
   return (
@@ -11,7 +11,7 @@ export default function Footer() {
     alt=""
     fill
     sizes="100vw"
-    className="pointer-events-none object-cover object-top opacity-[0.04]"
+    className="pointer-events-none object-cover object-top opacity-[2.9]"
   />
   <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(248,249,250,0.98),rgba(248,249,250,0.9)_45%,rgba(248,249,250,0.98))]" />
   <div className="relative mx-auto flex max-w-[1184px] flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
