@@ -1,11 +1,11 @@
 import { Card } from "@/components/ui/card/Card";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 
 interface TestimonialCardProps {
 	quote: string;
 	name: string;
 	role: string;
-	avatar?: string;
+	avatar?: StaticImageData | string;
 }
 
 export function TestimonialCard({
@@ -25,9 +25,10 @@ export function TestimonialCard({
 					{avatar && (
 						<Image
 							src={avatar}
-							alt={name}
+							alt={`${name} profile photo`}
 							width={100}
 							height={100}
+							sizes="48px"
 							className="h-full w-full object-cover"
 						/>
 					)}

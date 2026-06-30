@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 
 import Badge from "@/components/ui/Badge";
@@ -8,7 +8,9 @@ interface HeroProps {
 	badge?: string;
 	title: string;
 	description: string;
-	image: string;
+	image: StaticImageData | string;
+	imageAlt?: string;
+	preloadImage?: boolean;
 
 	primaryAction?: {
 		label: string;
@@ -26,6 +28,8 @@ export default function Hero({
 	title,
 	description,
 	image,
+	imageAlt,
+	preloadImage = true,
 	primaryAction,
 	secondaryAction,
 }: HeroProps) {
@@ -65,14 +69,16 @@ export default function Hero({
 				<div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-black/5 to-transparent blur-xl" />
 
 				<div className="relative overflow-hidden rounded-2xl border border-[#CFC4C580] bg-white p-[17px] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.05),0px_2px_4px_-1px_rgba(0,0,0,0.03)]">
-					<Image
-						src={image}
-						alt={title}
-						width={1184}
-						height={642}
-						priority
-						className="aspect-[1151/642] h-auto w-full rounded-xl object-cover"
-					/>
+					<div className="relative aspect-[1151/642] w-full overflow-hidden rounded-xl">
+						<Image
+							src={image}
+							alt={imageAlt ?? title}
+							fill
+							preload={preloadImage}
+							sizes="(min-width: 1280px) 1151px, calc(100vw - 70px)"
+							className="object-cover"
+						/>
+					</div>
 				</div>
 			</div>
 		</section>
