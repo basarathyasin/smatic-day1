@@ -7,6 +7,7 @@ import {
   PricingSection,
   TestimonialsSection,
 } from "@/components/sections";
+import heroImage from "@/public/hero.png";
 
 export default function Home() {
 	return (
@@ -16,7 +17,8 @@ export default function Home() {
 				title="The new standard for modern software."
 				description="Build, ship, and scale with the most intuitive platform designed for elite
        engineering teams. Move faster without breaking things."
-				image="/hero.png"
+				image={heroImage}
+				imageAlt="Dashboard preview of the VITE software platform"
 				primaryAction={{
 					label: "Get Started",
 					href: "/signup",

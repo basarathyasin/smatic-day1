@@ -1,9 +1,20 @@
+import Image from "next/image";
 import Link from "next/link";
+
+import footerBackground from "@/public/hero.png";
 
 export default function Footer() {
   return (
-   <footer className="border-t border-[#E7E8E9] bg-[#F8F9FA] px-6 py-12 md:px-12">
-  <div className="mx-auto flex max-w-[1184px] flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
+   <footer className="relative overflow-hidden border-t border-[#E7E8E9] bg-[#F8F9FA] px-6 py-12 md:px-12">
+  <Image
+    src={footerBackground}
+    alt=""
+    fill
+    sizes="100vw"
+    className="pointer-events-none object-cover object-top opacity-[0.04]"
+  />
+  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(248,249,250,0.98),rgba(248,249,250,0.9)_45%,rgba(248,249,250,0.98))]" />
+  <div className="relative mx-auto flex max-w-[1184px] flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
     <div>
       <h2 className="font-heading text-xl font-bold">
         VITE
