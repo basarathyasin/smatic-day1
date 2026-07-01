@@ -1,4 +1,5 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface DashboardNavbarProps {
   title?: string;
@@ -15,7 +16,7 @@ export function DashboardNavbar({
         <SidebarTrigger />
 
         <div className="min-w-0">
-          <h1 className="truncate font-heading text-base font-semibold text-[#191C1D]">
+          <h1 className="truncate font-heading text-base font-semibold text-[#191C1D] dark:text-white">
             {title}
           </h1>
 
@@ -24,6 +25,8 @@ export function DashboardNavbar({
           </p>
         </div>
       </div>
+
+      <ThemeToggle />
     </header>
   );
 }

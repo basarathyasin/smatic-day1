@@ -33,14 +33,14 @@ export function PricingCard({
 				className={cn(
 					"flex flex-col p-8 transition-colors",
 					featured
-						? "min-h-[526px] border-black bg-black text-white"
-						: "min-h-[494px] bg-white text-[#191C1D]"
+						? "min-h-[526px] border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+						: "min-h-[494px] bg-white text-[#191C1D] dark:bg-[#101214] dark:text-white"
 				)}
 			>
 				<div>
 					{badge && (
-						<div className="mb-6 inline-flex rounded-full bg-white/10 px-3 py-1">
-							<span className="font-heading text-xs font-semibold tracking-[0.6px] text-white">
+						<div className="mb-6 inline-flex rounded-full bg-white/10 px-3 py-1 dark:bg-black/10">
+							<span className="font-heading text-xs font-semibold tracking-[0.6px] text-white dark:text-black">
 								{badge.charAt(0) + badge.slice(1).toLowerCase()}
 							</span>
 						</div>
@@ -59,7 +59,7 @@ export function PricingCard({
 							<span
 								className={cn(
 									"text-base",
-									featured ? "text-zinc-400" : "text-[#585F6C]"
+									featured ? "text-zinc-400 dark:text-zinc-600" : "text-[#585F6C] dark:text-zinc-400"
 								)}
 							>
 								{period}
@@ -70,7 +70,7 @@ export function PricingCard({
 					<p
 						className={cn(
 							"mt-6 text-base leading-8",
-							featured ? "text-zinc-400" : "text-[#585F6C]"
+							featured ? "text-zinc-400 dark:text-zinc-600" : "text-[#585F6C] dark:text-zinc-400"
 						)}
 					>
 						{description}
@@ -94,7 +94,7 @@ export function PricingCard({
 					variant={featured ? "secondary" : "outline"}
 					className={cn(
 						"mt-8 w-full",
-						featured && "bg-white text-black hover:bg-zinc-100"
+						featured && "bg-white text-black hover:bg-zinc-100 dark:bg-black dark:text-white dark:hover:bg-zinc-800"
 					)}
 				>
 					<span>{cta}</span>

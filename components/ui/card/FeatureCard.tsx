@@ -14,15 +14,15 @@ export function FeatureCard({
 }: FeatureCardProps) {
   return (
     <Card className="min-h-[230px] p-[33px]">
-      <div className="text-black">
+      <div className="text-black dark:text-white">
         {icon}
       </div>
 
-      <h3 className="mt-6 font-heading text-[24px] font-semibold leading-8 tracking-[-0.48px] text-[#191C1D]">
+      <h3 className="mt-6 font-heading text-[24px] font-semibold leading-8 tracking-[-0.48px] text-[#191C1D] dark:text-white">
         {title}
       </h3>
 
-      <p className="mt-3 text-sm leading-5 text-[#585F6C]">
+      <p className="mt-3 text-sm leading-5 text-[#585F6C] dark:text-zinc-400">
         {description}
       </p>
     </Card>
