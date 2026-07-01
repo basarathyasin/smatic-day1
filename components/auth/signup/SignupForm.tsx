@@ -25,11 +25,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
+import SuccessModal from "./SuccessModal";
+
+
 export function SignupForm({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
-	const router = useRouter();
+
 
 	const {
 		register,
@@ -46,7 +49,8 @@ export function SignupForm({
 		},
 	});
 	const [showPassword, setShowPassword] = useState(false);
-	const [showConfirmPassword,setShowConfirmPassword] = useState(false);
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+	const [open, setOpen] = useState(false);
 
 	const onSubmit = async (data: SignupFormData) => {
 		try {
@@ -57,8 +61,8 @@ export function SignupForm({
 			await new Promise((resolve) => setTimeout(resolve, 2000));
 
 			reset();
-
-			router.replace("/dashboard");
+			setOpen(true);
+			// router.replace("/dashboard");
 		} catch (error) {
 			console.error(error);
 		}
@@ -66,6 +70,7 @@ export function SignupForm({
 
 	return (
 		<div className={cn("flex flex-col", className)} {...props}>
+			<SuccessModal open={open} setOpen={setOpen} />
 			<Card className="rounded-xl border-[#E2E8F0] bg-white shadow-sm">
 				<CardHeader className="gap-1.5 px-5 pt-5 text-center">
 					<CardTitle className="text-xl font-semibold text-[#111827]">
@@ -137,7 +142,7 @@ export function SignupForm({
 											onClick={() => setShowPassword(!showPassword)}
 											className="absolute right-3 top-1/2 -translate-y-1/2"
 										>
-											{showPassword ? "🙈" : "👁" }
+											{showPassword ? "🙈" : "👁"}
 										</button>
 									</div>
 
@@ -150,38 +155,35 @@ export function SignupForm({
 
 								<Field>
 									<FieldLabel
-						
 										htmlFor="confirm-password"
 										className="text-[#334155]"
 									>
-
 										Confirm Password
 									</FieldLabel>
 
 									<div className="relative">
-
-									<Input
-										id="confirm-password"
-										type={showConfirmPassword ? "text" : "password"}
-										className="h-10 border-[#CBD5E1] bg-white px-3"
-										{...register("confirmPassword")}
-									/>
-									<button
+										<Input
+											id="confirm-password"
+											type={showConfirmPassword ? "text" : "password"}
+											className="h-10 border-[#CBD5E1] bg-white px-3"
+											{...register("confirmPassword")}
+										/>
+										<button
 											type="button"
-											onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+											onClick={() =>
+												setShowConfirmPassword(!showConfirmPassword)
+											}
 											className="absolute right-3 top-1/2 -translate-y-1/2"
 										>
-											{showConfirmPassword ? "🙈" : "👁" }
+											{showConfirmPassword ? "🙈" : "👁"}
 										</button>
-
-										</div>
+									</div>
 
 									{errors.confirmPassword && (
 										<p className="text-sm text-destructive">
 											{errors.confirmPassword.message}
 										</p>
 									)}
-									
 								</Field>
 							</div>
 
