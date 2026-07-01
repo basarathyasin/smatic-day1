@@ -1,10 +1,6 @@
 "use client";
 
-import {
-	useEffect,
-	useSyncExternalStore,
-	type ReactNode,
-} from "react";
+import { useEffect, useSyncExternalStore, type ReactNode } from "react";
 
 import { ThemeContext, type Theme } from "@/app/context/ThemeContext";
 
@@ -15,9 +11,7 @@ type ThemeProviderProps = {
 	children: ReactNode;
 };
 
-export default function ThemeProvider({
-	children,
-}: ThemeProviderProps) {
+export default function ThemeProvider({ children }: ThemeProviderProps) {
 	const theme = useSyncExternalStore(
 		subscribeToTheme,
 		getThemeSnapshot,
@@ -25,10 +19,7 @@ export default function ThemeProvider({
 	);
 
 	useEffect(() => {
-		document.documentElement.classList.toggle(
-			"dark",
-			theme === "dark"
-		);
+		document.documentElement.classList.toggle("dark", theme === "dark");
 	}, [theme]);
 
 	function toggleTheme() {

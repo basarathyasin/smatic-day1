@@ -1,3 +1,4 @@
+import AuthProvider from "@/app/providers/AuthProvider";
 import ThemeProvider from "@/app/providers/ThemeProvider";
 import { Geist, Inter } from "next/font/google";
 
@@ -22,9 +23,11 @@ export default function RootLayout({
 	return (
 		<html lang="en" className={cn(geist.variable, inter.variable)}>
 			<body className="min-h-screen">
-				<ThemeProvider>
-					{children}
-				</ThemeProvider>
+				<AuthProvider>
+					<ThemeProvider>
+						{children}
+					</ThemeProvider>
+				</AuthProvider>
 			</body>
 		</html>
 	);

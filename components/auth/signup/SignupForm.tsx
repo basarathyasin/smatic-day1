@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
 import SuccessModal from "./SuccessModal";
+import { useAuth } from "@/hooks/useAuth";
 
 export function SignupForm({
 	className,
@@ -48,12 +49,17 @@ export function SignupForm({
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [open, setOpen] = useState(false);
+	const { login } = useAuth();
 
 	const onSubmit = async (data: SignupFormData) => {
 		try {
 			console.log(data);
 
 			localStorage.setItem("users", JSON.stringify(data));
+			login({
+				name: data.name,
+				email: data.email,
+			});
 
 			await new Promise((resolve) => setTimeout(resolve, 2000));
 

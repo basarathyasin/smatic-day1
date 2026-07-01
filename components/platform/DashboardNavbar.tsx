@@ -1,5 +1,6 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { UserInitial } from "@/components/ui/user-initial";
 
 interface DashboardNavbarProps {
   title?: string;
@@ -26,7 +27,10 @@ export function DashboardNavbar({
         </div>
       </div>
 
-      <ThemeToggle />
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
+        <UserInitial />
+      </div>
     </header>
   );
 }
