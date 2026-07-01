@@ -23,6 +23,7 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 export function SignupForm({
 	className,
@@ -44,6 +45,8 @@ export function SignupForm({
 			confirmPassword: "",
 		},
 	});
+	const [showPassword, setShowPassword] = useState(false);
+	const [showConfirmPassword,setShowConfirmPassword] = useState(false);
 
 	const onSubmit = async (data: SignupFormData) => {
 		try {
@@ -121,13 +124,22 @@ export function SignupForm({
 									<FieldLabel htmlFor="password" className="text-[#334155]">
 										Password
 									</FieldLabel>
+									<div className="relative">
+										<Input
+											id="password"
+											type={showPassword ? "text" : "password"}
+											className="h-10 border-[#CBD5E1] bg-white px-3 pr-10"
+											{...register("password")}
+										/>
 
-									<Input
-										id="password"
-										type="password"
-										className="h-10 border-[#CBD5E1] bg-white px-3"
-										{...register("password")}
-									/>
+										<button
+											type="button"
+											onClick={() => setShowPassword(!showPassword)}
+											className="absolute right-3 top-1/2 -translate-y-1/2"
+										>
+											{showPassword ? "🙈" : "👁" }
+										</button>
+									</div>
 
 									{errors.password && (
 										<p className="text-sm text-destructive">
@@ -138,24 +150,38 @@ export function SignupForm({
 
 								<Field>
 									<FieldLabel
+						
 										htmlFor="confirm-password"
 										className="text-[#334155]"
 									>
+
 										Confirm Password
 									</FieldLabel>
 
+									<div className="relative">
+
 									<Input
 										id="confirm-password"
-										type="password"
+										type={showConfirmPassword ? "text" : "password"}
 										className="h-10 border-[#CBD5E1] bg-white px-3"
 										{...register("confirmPassword")}
 									/>
+									<button
+											type="button"
+											onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+											className="absolute right-3 top-1/2 -translate-y-1/2"
+										>
+											{showConfirmPassword ? "🙈" : "👁" }
+										</button>
+
+										</div>
 
 									{errors.confirmPassword && (
 										<p className="text-sm text-destructive">
 											{errors.confirmPassword.message}
 										</p>
 									)}
+									
 								</Field>
 							</div>
 
