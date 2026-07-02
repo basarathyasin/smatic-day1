@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const links = [
   { href: "/#features", label: "Features" },
@@ -19,12 +20,12 @@ export default function Navbar() {
   const closeMenu = () => setIsOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-[#F8F9FA]/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-[#F8F9FA]/90 backdrop-blur-md dark:border-white/10 dark:bg-[#08090A]/90">
       <div className="flex h-[72px] w-full items-center justify-between px-6 md:px-12">
         <div className="flex items-center gap-12">
           <Link
             href="/"
-            className="font-heading text-xl font-black tracking-tight text-black"
+            className="font-heading text-xl font-black tracking-tight text-black dark:text-white"
             onClick={closeMenu}
           >
             VITE
@@ -35,7 +36,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-[#585F6C] transition-colors hover:text-black"
+                className="text-sm font-medium text-[#585F6C] transition-colors hover:text-black dark:text-zinc-400 dark:hover:text-white"
               >
                 {link.label}
               </Link>
@@ -44,7 +45,8 @@ export default function Navbar() {
         </div>
 
         <div className="hidden items-center gap-2 md:flex">
-      
+          <ThemeToggle />
+
           <Button asChild size="sm" variant="ghost" className="h-9 px-4">
             <Link href="/login">
               Login
@@ -75,14 +77,14 @@ export default function Navbar() {
       {isOpen && (
         <div
           id="mobile-navigation"
-          className="border-t border-black/10 bg-zinc-50 px-6 py-5 shadow-sm md:hidden"
+          className="border-t border-black/10 bg-zinc-50 px-6 py-5 shadow-sm dark:border-white/10 dark:bg-[#0F1113] md:hidden"
         >
           <nav className="flex flex-col gap-1">
             {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-lg px-2 py-3 text-base font-light text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-black"
+                className="rounded-lg px-2 py-3 text-base font-light text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-black dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white"
                 onClick={closeMenu}
               >
                 {link.label}
@@ -91,6 +93,8 @@ export default function Navbar() {
           </nav>
 
           <div className="mt-5 grid gap-3">
+            <ThemeToggle showLabel width="full" />
+
             <Button asChild size="sm" variant="ghost" width="full">
               <Link href="/login" onClick={closeMenu}>
                 Login

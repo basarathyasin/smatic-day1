@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -23,13 +23,15 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
+
+import SuccessModal from "./SuccessModal";
+import { useAuth } from "@/hooks/useAuth";
 
 export function SignupForm({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
-	const router = useRouter();
-
 	const {
 		register,
 		handleSubmit,
@@ -44,18 +46,26 @@ export function SignupForm({
 			confirmPassword: "",
 		},
 	});
+	const [showPassword, setShowPassword] = useState(false);
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+	const [open, setOpen] = useState(false);
+	const { login } = useAuth();
 
 	const onSubmit = async (data: SignupFormData) => {
 		try {
 			console.log(data);
 
 			localStorage.setItem("users", JSON.stringify(data));
+			login({
+				name: data.name,
+				email: data.email,
+			});
 
 			await new Promise((resolve) => setTimeout(resolve, 2000));
 
 			reset();
-
-			router.replace("/dashboard");
+			setOpen(true);
+			// router.replace("/dashboard");
 		} catch (error) {
 			console.error(error);
 		}
@@ -63,6 +73,7 @@ export function SignupForm({
 
 	return (
 		<div className={cn("flex flex-col", className)} {...props}>
+			<SuccessModal open={open} setOpen={setOpen} />
 			<Card className="rounded-xl border-[#E2E8F0] bg-white shadow-sm">
 				<CardHeader className="gap-1.5 px-5 pt-5 text-center">
 					<CardTitle className="text-xl font-semibold text-[#111827]">
@@ -121,13 +132,22 @@ export function SignupForm({
 									<FieldLabel htmlFor="password" className="text-[#334155]">
 										Password
 									</FieldLabel>
+									<div className="relative">
+										<Input
+											id="password"
+											type={showPassword ? "text" : "password"}
+											className="h-10 border-[#CBD5E1] bg-white px-3 pr-10"
+											{...register("password")}
+										/>
 
-									<Input
-										id="password"
-										type="password"
-										className="h-10 border-[#CBD5E1] bg-white px-3"
-										{...register("password")}
-									/>
+										<button
+											type="button"
+											onClick={() => setShowPassword(!showPassword)}
+											className="absolute right-3 top-1/2 -translate-y-1/2"
+										>
+											{showPassword ? "🙈" : "👁"}
+										</button>
+									</div>
 
 									{errors.password && (
 										<p className="text-sm text-destructive">
@@ -144,12 +164,23 @@ export function SignupForm({
 										Confirm Password
 									</FieldLabel>
 
-									<Input
-										id="confirm-password"
-										type="password"
-										className="h-10 border-[#CBD5E1] bg-white px-3"
-										{...register("confirmPassword")}
-									/>
+									<div className="relative">
+										<Input
+											id="confirm-password"
+											type={showConfirmPassword ? "text" : "password"}
+											className="h-10 border-[#CBD5E1] bg-white px-3"
+											{...register("confirmPassword")}
+										/>
+										<button
+											type="button"
+											onClick={() =>
+												setShowConfirmPassword(!showConfirmPassword)
+											}
+											className="absolute right-3 top-1/2 -translate-y-1/2"
+										>
+											{showConfirmPassword ? "🙈" : "👁"}
+										</button>
+									</div>
 
 									{errors.confirmPassword && (
 										<p className="text-sm text-destructive">
