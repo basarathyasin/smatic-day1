@@ -5,6 +5,8 @@ import { useState, type ReactNode } from "react";
 import { AuthContext, type AuthUser } from "@/app/context/AuthContext";
 
 const CURRENT_USER_STORAGE_KEY = "currentUser";
+const IS_AUTHENTICATED_STORAGE_KEY = "isAuthenticated";
+const USERS_STORAGE_KEY = "users";
 
 type AuthProviderProps = {
 	children: ReactNode;
@@ -24,11 +26,13 @@ export default function AuthProvider({
 	function login(user: AuthUser) {
 		setCurrentUser(user);
 		localStorage.setItem(CURRENT_USER_STORAGE_KEY, JSON.stringify(user));
+		localStorage.setItem(IS_AUTHENTICATED_STORAGE_KEY, "true");
 	}
 
 	function logout() {
 		setCurrentUser(null);
 		localStorage.removeItem(CURRENT_USER_STORAGE_KEY);
+		localStorage.removeItem(IS_AUTHENTICATED_STORAGE_KEY);
 	}
 
 	const isAuthenticated = currentUser !== null;
@@ -50,17 +54,36 @@ export default function AuthProvider({
 function getStoredUser(): AuthUser | null {
 	const storedUser = localStorage.getItem(CURRENT_USER_STORAGE_KEY);
 
-	if (!storedUser) {
+	if (storedUser) {
+		const parsedUser = parseAuthUser(storedUser);
+
+		if (parsedUser) {
+			return parsedUser;
+		}
+	}
+
+	if (localStorage.getItem(IS_AUTHENTICATED_STORAGE_KEY) !== "true") {
 		return null;
 	}
 
-	try {
-		const parsed = JSON.parse(storedUser) as Partial<AuthUser>;
+	const storedUsers = localStorage.getItem(USERS_STORAGE_KEY);
 
-		if (typeof parsed.name === "string" && typeof parsed.email === "string") {
+	if (!storedUsers) {
+		return null;
+	}
+
+	return parseAuthUser(storedUsers);
+}
+
+function parseAuthUser(value: string): AuthUser | null {
+	try {
+		const parsed = JSON.parse(value) as Partial<AuthUser> | Partial<AuthUser>[];
+		const user = Array.isArray(parsed) ? parsed.at(-1) : parsed;
+
+		if (typeof user?.name === "string" && typeof user.email === "string") {
 			return {
-				name: parsed.name,
-				email: parsed.email,
+				name: user.name,
+				email: user.email,
 			};
 		}
 	} catch {

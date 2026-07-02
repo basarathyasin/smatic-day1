@@ -1,4 +1,5 @@
 import Footer from "@/components/layout/Footer";
+import { AuthRedirect } from "@/components/auth/AuthRedirect";
 
 export default function RootLayout({
   children,
@@ -7,6 +8,7 @@ export default function RootLayout({
 }>) {
   return (
     <div className="flex min-h-screen flex-col bg-[#F8FAFC]">
+      <AuthRedirect />
       <main className="flex w-full flex-1 items-center justify-center px-4 py-6">
         {children}
       </main>

@@ -1,29 +1,39 @@
 "use client";
 
-import { useEffect, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { ThemeContext, type Theme } from "@/app/context/ThemeContext";
 
 const THEME_STORAGE_KEY = "theme";
-const THEME_CHANGE_EVENT = "theme-change";
 
 type ThemeProviderProps = {
 	children: ReactNode;
 };
 
 export default function ThemeProvider({ children }: ThemeProviderProps) {
-	const theme = useSyncExternalStore(
-		subscribeToTheme,
-		getThemeSnapshot,
-		getServerThemeSnapshot,
-	);
+	const [theme, setTheme] = useState<Theme>("light");
+	const hasLoadedStoredTheme = useRef(false);
+
+	useEffect(() => {
+		const frame = window.requestAnimationFrame(() => {
+			hasLoadedStoredTheme.current = true;
+			setTheme(getStoredTheme());
+		});
+
+		return () => window.cancelAnimationFrame(frame);
+	}, []);
 
 	useEffect(() => {
 		document.documentElement.classList.toggle("dark", theme === "dark");
+
+		if (hasLoadedStoredTheme.current) {
+			localStorage.setItem(THEME_STORAGE_KEY, theme);
+		}
 	}, [theme]);
 
 	function toggleTheme() {
-		setTheme(theme === "light" ? "dark" : "light");
+		hasLoadedStoredTheme.current = true;
+		setTheme((currentTheme) => (currentTheme === "light" ? "dark" : "light"));
 	}
 
 	return (
@@ -38,29 +48,10 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
 	);
 }
 
-function getServerThemeSnapshot(): Theme {
-	return "light";
-}
-
-function getThemeSnapshot(): Theme {
+function getStoredTheme(): Theme {
 	const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
 
 	return storedTheme === "dark" || storedTheme === "light"
 		? storedTheme
 		: "light";
-}
-
-function subscribeToTheme(onStoreChange: () => void) {
-	window.addEventListener("storage", onStoreChange);
-	window.addEventListener(THEME_CHANGE_EVENT, onStoreChange);
-
-	return () => {
-		window.removeEventListener("storage", onStoreChange);
-		window.removeEventListener(THEME_CHANGE_EVENT, onStoreChange);
-	};
-}
-
-function setTheme(theme: Theme) {
-	localStorage.setItem(THEME_STORAGE_KEY, theme);
-	window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
 }

@@ -36,7 +36,9 @@ export function TodoPrioritySelect({
 }: TodoPrioritySelectProps) {
 	return (
 		<div className={cn("space-y-2", className)}>
-			<span className="text-sm font-medium text-[#191C1D]">{label}</span>
+			<span className="text-sm font-medium text-[#191C1D] dark:text-zinc-100">
+				{label}
+			</span>
 			<Select
 				value={value}
 				onValueChange={(nextValue) => onChange(nextValue as TodoPriority)}
@@ -44,7 +46,12 @@ export function TodoPrioritySelect({
 				<SelectTrigger className={cn("w-full", selectClassName)}>
 					<SelectValue placeholder={label} />
 				</SelectTrigger>
-				<SelectContent>
+				<SelectContent
+					align="start"
+					className="z-[90]"
+					position="popper"
+					sideOffset={8}
+				>
 					{options.map((option) => (
 						<SelectItem key={option.value} value={option.value}>
 							{option.label}
